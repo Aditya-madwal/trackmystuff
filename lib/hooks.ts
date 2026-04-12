@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Task, DSAQuestion, SystemDesignNote, TaskStatus } from "./types";
+import {
+  Task,
+  DSAQuestion,
+  SystemDesignNote,
+  TaskStatus,
+  Resource,
+} from "./types";
 
 // Helper: map MongoDB _id → id for frontend compatibility
 function mapId<T extends Record<string, unknown>>(doc: T): T & { id: string } {
@@ -195,4 +201,49 @@ export function useSystemDesignNotes() {
   };
 
   return { notes, addNote, updateNote, deleteNote, isLoaded };
+}
+
+// ---------------------------------------------------------------------------
+// Important Resources
+// ---------------------------------------------------------------------------
+export function useResources() {
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  const fetchResources = useCallback(async () => {
+    try {
+      const res = await fetch("/api/resources");
+      if (!res.ok) throw new Error("Failed to fetch resources");
+      const data = await res.json();
+      setResources(data.map(mapId));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchResources();
+  }, [fetchResources]);
+
+  const addResource = async (resource: Omit<Resource, "id" | "createdAt">) => {
+    const res = await fetch("/api/resources", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(resource),
+    });
+    if (!res.ok) throw new Error("Failed to create resource");
+    const created = mapId(await res.json());
+    setResources((prev) => [created, ...prev]);
+    return created;
+  };
+
+  const deleteResource = async (id: string) => {
+    const res = await fetch(`/api/resources/${id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("Failed to delete resource");
+    setResources((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  return { resources, addResource, deleteResource, isLoaded };
 }

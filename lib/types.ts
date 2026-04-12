@@ -1,6 +1,6 @@
-export type TaskStatus = 'todo' | 'in-progress' | 'completed';
-export type TaskDomain = 'dsa' | 'system-design' | 'frontend' | 'backend';
-export type Difficulty = 'Easy' | 'Medium' | 'Hard';
+export type TaskStatus = "todo" | "in-progress" | "completed";
+export type TaskDomain = "dsa" | "system-design" | "frontend" | "backend";
+export type Difficulty = "Easy" | "Medium" | "Hard";
 
 export interface Task {
   id: string;
@@ -30,6 +30,14 @@ export interface SystemDesignNote {
   content: string;
   diagrams?: string[];
   references?: Array<{ title: string; url: string }>;
+  createdAt: string;
+}
+
+export interface Resource {
+  id: string;
+  title: string;
+  desc: string;
+  url: string;
   createdAt: string;
 }
 

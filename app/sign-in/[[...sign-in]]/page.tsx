@@ -9,10 +9,10 @@ export default function SignInPage() {
         {/* Branding */}
         <div className="text-center space-y-2">
           <div className="mx-auto w-10 h-10 rounded-lg bg-accent/15 flex items-center justify-center font-bold text-accent text-lg">
-            N
+            T
           </div>
           <h1 className="text-2xl font-semibold text-foreground">
-            Welcome to Nexus
+            Welcome to TrackMyStuff
           </h1>
           <p className="text-sm text-muted-foreground">
             Sign in to access your learning dashboard

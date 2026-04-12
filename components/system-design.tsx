@@ -3,122 +3,57 @@
 import { useSystemDesignNotes } from "@/lib/hooks";
 import { Plus, Trash2, ChevronDown, ExternalLink } from "lucide-react";
 import { useState, useMemo } from "react";
+import { Modal } from "@/components/modal";
+import Markdown from "markdown-to-jsx";
 
-// Markdown renderer function
-const renderMarkdown = (text: string): React.ReactNode => {
-  const lines = text.split("\n");
-  const elements: React.ReactNode[] = [];
-  let codeBlock = false;
-  let codeContent = "";
-  let listItems: string[] = [];
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-
-    // Code blocks
-    if (line.startsWith("```")) {
-      if (codeBlock) {
-        elements.push(
-          <pre
-            key={`code-${i}`}
-            className="bg-primary/8 border border-border/30 rounded-md p-3 overflow-x-auto text-xs font-mono text-foreground/80 leading-relaxed mb-2.5"
-          >
-            {codeContent.trim()}
-          </pre>,
-        );
-        codeContent = "";
-        codeBlock = false;
-      } else {
-        codeBlock = true;
-      }
-      continue;
-    }
-
-    if (codeBlock) {
-      codeContent += line + "\n";
-      continue;
-    }
-
-    // Headers
-    if (line.startsWith("## ")) {
-      elements.push(
-        <h3
-          key={`h3-${i}`}
-          className="text-sm font-semibold mt-3 mb-1.5 text-foreground"
-        >
-          {line.slice(3)}
-        </h3>,
-      );
-      continue;
-    }
-
-    if (line.startsWith("# ")) {
-      elements.push(
-        <h2
-          key={`h2-${i}`}
-          className="text-base font-bold mt-3 mb-2 text-foreground"
-        >
-          {line.slice(2)}
-        </h2>,
-      );
-      continue;
-    }
-
-    // Bold and italic
-    let processedLine = line
-      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-      .replace(/\*([^*]+)\*/g, "<em>$1</em>")
-      .replace(/`([^`]+)`/g, "<code>$1</code>");
-
-    // Lists
-    if (line.startsWith("- ") || line.startsWith("* ")) {
-      listItems.push(line.slice(2));
-      continue;
-    } else if (listItems.length > 0) {
-      elements.push(
-        <ul
-          key={`list-${i}`}
-          className="list-disc list-inside text-sm text-foreground mb-2.5 space-y-0.5"
-        >
-          {listItems.map((item, idx) => (
-            <li key={idx}>{item}</li>
-          ))}
-        </ul>,
-      );
-      listItems = [];
-    }
-
-    // Empty lines and regular text
-    if (line.trim()) {
-      elements.push(
-        <p key={`p-${i}`} className="text-sm text-foreground mb-2">
-          {processedLine}
-        </p>,
-      );
-    } else if (elements.length > 0) {
-      elements.push(<div key={`space-${i}`} className="h-1" />);
-    }
-  }
-
-  // Handle remaining list items
-  if (listItems.length > 0) {
-    elements.push(
-      <ul
-        key="final-list"
-        className="list-disc list-inside text-sm text-foreground mb-2.5 space-y-0.5"
-      >
-        {listItems.map((item, idx) => (
-          <li key={idx}>{item}</li>
-        ))}
-      </ul>,
-    );
-  }
-
-  return elements.length > 0 ? (
-    elements
-  ) : (
-    <p className="text-sm text-foreground">{text}</p>
-  );
+const markdownOverrides = {
+  h1: { props: { className: "text-base font-bold mt-3 mb-2 text-foreground" } },
+  h2: {
+    props: { className: "text-sm font-semibold mt-3 mb-1.5 text-foreground" },
+  },
+  h3: { props: { className: "text-sm font-medium mt-2 mb-1 text-foreground" } },
+  p: { props: { className: "text-sm text-foreground mb-2 leading-relaxed" } },
+  ul: {
+    props: {
+      className:
+        "list-disc list-inside text-sm text-foreground mb-2.5 space-y-0.5",
+    },
+  },
+  ol: {
+    props: {
+      className:
+        "list-decimal list-inside text-sm text-foreground mb-2.5 space-y-0.5",
+    },
+  },
+  li: { props: { className: "text-sm text-foreground" } },
+  strong: { props: { className: "font-semibold text-foreground" } },
+  em: { props: { className: "italic" } },
+  code: {
+    props: {
+      className:
+        "bg-muted px-1.5 py-0.5 rounded text-xs font-mono text-foreground/80",
+    },
+  },
+  pre: {
+    props: {
+      className:
+        "bg-card border border-border/40 rounded-xl p-4 overflow-x-auto text-xs font-mono text-foreground/80 leading-relaxed mb-2.5",
+    },
+  },
+  a: {
+    props: {
+      className: "text-accent hover:text-accent/80 underline transition-colors",
+      target: "_blank",
+      rel: "noopener noreferrer",
+    },
+  },
+  blockquote: {
+    props: {
+      className:
+        "border-l-2 border-accent/40 pl-3 my-2 text-sm text-muted-foreground italic",
+    },
+  },
+  hr: { props: { className: "border-border/40 my-3" } },
 };
 
 export function SystemDesign() {
@@ -170,142 +105,151 @@ export function SystemDesign() {
 
   if (!isLoaded) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-muted-foreground">Loading...</div>
+      <div className="flex items-center justify-center p-12">
+        <div className="flex items-center gap-3 text-muted-foreground">
+          <div className="w-5 h-5 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
+          <span className="text-sm">Loading notes...</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-base font-semibold">Architecture Notes</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <h1 className="text-xl font-bold text-foreground">
+            Architecture Notes
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
             Patterns, designs, and knowledge base
           </p>
         </div>
-        {!showForm && (
-          <button
-            onClick={() => setShowForm(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md bg-accent/10 text-accent hover:bg-accent/15 transition-colors"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            New
-          </button>
-        )}
+        <button
+          onClick={() => setShowForm(true)}
+          className="glass-button flex items-center gap-2"
+        >
+          <Plus className="w-4 h-4" />
+          New Note
+        </button>
       </div>
 
       {/* Search Bar */}
       {notes.length > 0 && (
-        <div className="glass-card p-3">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search notes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="glass-input w-full pl-8"
+        <div className="relative">
+          <svg
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
             />
-            <svg
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </div>
+          </svg>
+          <input
+            type="text"
+            placeholder="Search notes..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="glass-input w-full pl-10"
+          />
         </div>
       )}
 
-      {/* Add Note Form */}
-      {showForm && (
-        <div className="glass-card p-4">
-          <form onSubmit={handleAddNote} className="space-y-3.5">
-            <div>
-              <label className="text-xs font-medium block mb-1.5 text-muted-foreground">
-                Title
-              </label>
-              <input
-                type="text"
-                placeholder="e.g., Database Sharding Strategy"
-                className="glass-input w-full"
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-                autoFocus
-              />
-            </div>
+      {/* Add Note Modal */}
+      <Modal
+        open={showForm}
+        onClose={() => setShowForm(false)}
+        title="Create New Note"
+        wide
+      >
+        <form onSubmit={handleAddNote} className="space-y-4">
+          <div>
+            <label className="text-xs font-medium block mb-1.5 text-muted-foreground">
+              Title
+            </label>
+            <input
+              type="text"
+              placeholder="e.g., Database Sharding Strategy"
+              className="glass-input w-full"
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
+              autoFocus
+            />
+          </div>
 
-            <div>
-              <label className="text-xs font-medium block mb-1.5 text-muted-foreground">
-                Content
-              </label>
-              <textarea
-                placeholder={`Your architectural notes...
+          <div>
+            <label className="text-xs font-medium block mb-1.5 text-muted-foreground">
+              Content
+            </label>
+            <textarea
+              placeholder={`Your architectural notes...
 
 Key Points:
 - Point 1
 - Point 2`}
-                className="glass-input w-full resize-none font-mono text-sm"
-                rows={7}
-                value={formData.content}
-                onChange={(e) =>
-                  setFormData({ ...formData, content: e.target.value })
-                }
-              />
-            </div>
+              className="glass-input w-full resize-none font-mono text-sm"
+              rows={7}
+              value={formData.content}
+              onChange={(e) =>
+                setFormData({ ...formData, content: e.target.value })
+              }
+            />
+          </div>
 
-            <div>
-              <label className="text-xs font-medium block mb-1.5 text-muted-foreground">
-                References (optional)
-              </label>
-              <textarea
-                placeholder={`Title | URL
+          <div>
+            <label className="text-xs font-medium block mb-1.5 text-muted-foreground">
+              References (optional)
+            </label>
+            <textarea
+              placeholder={`Title | URL
 Example: CAP Theorem | https://example.com`}
-                className="glass-input w-full resize-none font-mono text-sm"
-                rows={2}
-                value={formData.references}
-                onChange={(e) =>
-                  setFormData({ ...formData, references: e.target.value })
-                }
-              />
-            </div>
+              className="glass-input w-full resize-none font-mono text-sm"
+              rows={2}
+              value={formData.references}
+              onChange={(e) =>
+                setFormData({ ...formData, references: e.target.value })
+              }
+            />
+          </div>
 
-            <div className="flex gap-2 justify-end pt-1">
-              <button
-                type="button"
-                onClick={() => setShowForm(false)}
-                className="glass-button-secondary"
-              >
-                Cancel
-              </button>
-              <button type="submit" className="glass-button">
-                Add Note
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+          <div className="flex gap-2 justify-end pt-1">
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              className="glass-button-secondary"
+            >
+              Cancel
+            </button>
+            <button type="submit" className="glass-button">
+              Add Note
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Notes List */}
       {notes.length === 0 ? (
-        <div className="glass-card p-8 text-center">
-          <div className="text-sm text-muted-foreground mb-1">No notes yet</div>
+        <div className="glass-card p-10 text-center">
+          <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mx-auto mb-3">
+            <Plus className="w-5 h-5 text-muted-foreground" />
+          </div>
+          <div className="text-sm font-medium text-foreground mb-1">
+            No notes yet
+          </div>
           <div className="text-xs text-muted-foreground">
             Create your first note to get started
           </div>
         </div>
       ) : filteredNotes.length === 0 ? (
-        <div className="glass-card p-8 text-center">
+        <div className="glass-card p-10 text-center">
           <div className="text-sm text-muted-foreground mb-1">
             No notes match your search
           </div>
@@ -314,7 +258,7 @@ Example: CAP Theorem | https://example.com`}
           </div>
         </div>
       ) : (
-        <div className="divide-y divide-border/40 glass-card overflow-hidden">
+        <div className="divide-y divide-border/30 glass-card overflow-hidden">
           {filteredNotes.map((note) => (
             <div key={note.id}>
               <div
@@ -329,18 +273,24 @@ Example: CAP Theorem | https://example.com`}
                     setExpandedId(expandedId === note.id ? null : note.id);
                   }
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors group cursor-pointer"
+                className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-muted/30 transition-colors group cursor-pointer"
               >
                 <ChevronDown
-                  className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform ${
+                  className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform duration-200 ${
                     expandedId === note.id ? "rotate-180" : ""
                   }`}
                 />
 
-                <div className="flex-1 text-left">
+                <div className="flex-1 text-left min-w-0">
                   <div className="font-medium text-sm">{note.title}</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">
-                    {new Date(note.createdAt).toLocaleDateString()}
+                  <div className="text-xs text-muted-foreground mt-1">
+                    <span className="badge badge-gray text-[11px]">
+                      {new Date(note.createdAt).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </span>
                   </div>
                 </div>
 
@@ -349,7 +299,7 @@ Example: CAP Theorem | https://example.com`}
                     e.stopPropagation();
                     deleteNote(note.id);
                   }}
-                  className="flex-shrink-0 p-1 opacity-0 group-hover:opacity-100 hover:bg-destructive/10 rounded transition-all"
+                  className="flex-shrink-0 p-1.5 opacity-0 group-hover:opacity-100 hover:bg-destructive/10 rounded-lg transition-all"
                   title="Delete note"
                 >
                   <Trash2 className="w-3.5 h-3.5 text-destructive" />
@@ -357,26 +307,28 @@ Example: CAP Theorem | https://example.com`}
               </div>
 
               {expandedId === note.id && (
-                <div className="border-t border-border/40 px-4 py-3.5 space-y-4 bg-muted/20">
-                  <div className="prose prose-sm max-w-none">
-                    {renderMarkdown(note.content)}
+                <div className="border-t border-border/30 px-5 py-4 space-y-4 bg-muted/15">
+                  <div className="max-w-none">
+                    <Markdown options={{ overrides: markdownOverrides }}>
+                      {note.content}
+                    </Markdown>
                   </div>
 
                   {note.references && note.references.length > 0 && (
                     <div>
-                      <h3 className="text-xs font-medium mb-2 text-muted-foreground uppercase tracking-tight">
+                      <h3 className="text-xs font-semibold mb-2 text-muted-foreground uppercase tracking-wide">
                         References
                       </h3>
-                      <div className="space-y-1.5">
+                      <div className="space-y-2">
                         {note.references.map((ref, idx) => (
                           <a
                             key={idx}
                             href={ref.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-xs text-accent hover:text-accent/80 transition-colors"
+                            className="flex items-center gap-2 text-sm text-accent hover:text-accent/80 transition-colors"
                           >
-                            <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                            <ExternalLink className="w-3.5 h-3.5 flex-shrink-0" />
                             <span className="truncate">{ref.title}</span>
                           </a>
                         ))}

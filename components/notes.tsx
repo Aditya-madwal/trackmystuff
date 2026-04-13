@@ -5,7 +5,6 @@ import { NoteCategory, NOTE_CATEGORIES } from "@/lib/types";
 import { Plus, Trash2, Pencil, Search, StickyNote } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Modal } from "@/components/modal";
-import { RichTextEditor } from "@/components/rich-text-editor";
 import Markdown from "markdown-to-jsx";
 
 const CATEGORY_COLORS: Record<NoteCategory, { badge: string; border: string }> =
@@ -281,10 +280,14 @@ export function Notes() {
             <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
               Description
             </label>
-            <RichTextEditor
-              content={formData.description}
-              onChange={(md) => setFormData({ ...formData, description: md })}
-              placeholder="Write your note..."
+            <textarea
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              placeholder="Write your note in markdown..."
+              rows={8}
+              className="glass-input w-full font-mono text-xs leading-relaxed resize-y"
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
@@ -405,10 +408,14 @@ export function Notes() {
             <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
               Description
             </label>
-            <RichTextEditor
-              content={formData.description}
-              onChange={(md) => setFormData({ ...formData, description: md })}
-              placeholder="Write your note..."
+            <textarea
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              placeholder="Write your note in markdown..."
+              rows={8}
+              className="glass-input w-full font-mono text-xs leading-relaxed resize-y"
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">

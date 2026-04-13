@@ -7,6 +7,7 @@ import {
   SystemDesignNote,
   TaskStatus,
   Resource,
+  Note,
 } from "./types";
 
 // Helper: map MongoDB _id → id for frontend compatibility
@@ -246,4 +247,60 @@ export function useResources() {
   };
 
   return { resources, addResource, deleteResource, isLoaded };
+}
+
+// ---------------------------------------------------------------------------
+// Notes
+// ---------------------------------------------------------------------------
+export function useNotes() {
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  const fetchNotes = useCallback(async () => {
+    try {
+      const res = await fetch("/api/notes");
+      if (!res.ok) throw new Error("Failed to fetch notes");
+      const data = await res.json();
+      setNotes(data.map(mapId));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchNotes();
+  }, [fetchNotes]);
+
+  const addNote = async (note: Omit<Note, "id" | "createdAt">) => {
+    const res = await fetch("/api/notes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(note),
+    });
+    if (!res.ok) throw new Error("Failed to create note");
+    const created = mapId(await res.json());
+    setNotes((prev) => [created, ...prev]);
+    return created;
+  };
+
+  const updateNote = async (id: string, updates: Partial<Note>) => {
+    const res = await fetch(`/api/notes/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updates),
+    });
+    if (!res.ok) throw new Error("Failed to update note");
+    const updated = mapId(await res.json());
+    setNotes((prev) => prev.map((n) => (n.id === id ? updated : n)));
+  };
+
+  const deleteNote = async (id: string) => {
+    const res = await fetch(`/api/notes/${id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("Failed to delete note");
+    setNotes((prev) => prev.filter((n) => n.id !== id));
+  };
+
+  return { notes, addNote, updateNote, deleteNote, isLoaded };
 }

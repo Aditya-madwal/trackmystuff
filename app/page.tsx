@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Dashboard } from "@/components/dashboard";
 import { DSALab } from "@/components/dsa-lab";
 import { SystemDesign } from "@/components/system-design";
+import { Notes } from "@/components/notes";
 import { UserButton } from "@clerk/nextjs";
 import {
   Menu,
@@ -12,12 +13,13 @@ import {
   LayoutDashboard,
   Code2,
   Layers,
+  StickyNote,
   Search,
   ChevronRight,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-type Tab = "todo" | "dsa" | "system-design";
+type Tab = "todo" | "dsa" | "system-design" | "notes";
 
 const TAB_CONFIG: Record<
   Tab,
@@ -33,6 +35,11 @@ const TAB_CONFIG: Record<
     label: "System Design",
     icon: Layers,
     description: "Architecture Notes",
+  },
+  notes: {
+    label: "Notes",
+    icon: StickyNote,
+    description: "Tips & Strategies",
   },
 };
 
@@ -212,6 +219,7 @@ export default function Home() {
           {activeTab === "todo" && <Dashboard />}
           {activeTab === "dsa" && <DSALab />}
           {activeTab === "system-design" && <SystemDesign />}
+          {activeTab === "notes" && <Notes />}
         </main>
       </div>
     </div>

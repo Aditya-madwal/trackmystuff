@@ -41,6 +41,33 @@ export interface Resource {
   createdAt: string;
 }
 
+export type NoteCategory =
+  | "dsa"
+  | "tips"
+  | "system design"
+  | "interview"
+  | "job"
+  | "general"
+  | "other";
+
+export const NOTE_CATEGORIES: NoteCategory[] = [
+  "dsa",
+  "tips",
+  "system design",
+  "interview",
+  "job",
+  "general",
+  "other",
+];
+
+export interface Note {
+  id: string;
+  title: string;
+  description: string;
+  category: NoteCategory;
+  createdAt: string;
+}
+
 export interface DashboardStats {
   activeSprints: number;
   verifiedTasks: number;

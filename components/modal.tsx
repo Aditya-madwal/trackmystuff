@@ -36,29 +36,29 @@ export function Modal({ open, onClose, title, children, wide }: ModalProps) {
       {/* Backdrop */}
       <div
         ref={overlayRef}
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60"
         onClick={onClose}
       />
 
       {/* Panel */}
       <div
-        className={`relative bg-card border border-border/60 rounded-2xl shadow-xl w-[calc(100%-2rem)] ${
-          wide ? "max-w-2xl" : "max-w-lg"
-        } max-h-[85vh] flex flex-col animate-in fade-in zoom-in-95 duration-200`}
+        className={`relative bg-card border border-border rounded-lg shadow-2xl w-[calc(100%-2rem)] ${
+          wide ? "max-w-2xl" : "max-w-md"
+        } max-h-[85vh] flex flex-col animate-in fade-in zoom-in-95 duration-150`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border/40 flex-shrink-0">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border flex-shrink-0">
           <h2 className="text-sm font-semibold text-foreground">{title}</h2>
           <button
             onClick={onClose}
-            className="p-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground"
+            className="p-1 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Body */}
-        <div className="px-6 py-5 overflow-y-auto flex-1">{children}</div>
+        <div className="px-5 py-4 overflow-y-auto flex-1">{children}</div>
       </div>
     </div>
   );

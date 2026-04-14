@@ -15,18 +15,21 @@ const DIFFICULTY_CONFIG = {
 const DIFFICULTY_FILTER_COLORS = {
   Easy: {
     active:
-      "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 ring-1 ring-emerald-200 dark:ring-emerald-500/30",
-    inactive: "bg-muted text-muted-foreground hover:bg-muted/80",
+      "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
+    inactive:
+      "bg-transparent text-muted-foreground border border-border hover:border-foreground/20 hover:text-foreground",
   },
   Medium: {
     active:
-      "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400 ring-1 ring-amber-200 dark:ring-amber-500/30",
-    inactive: "bg-muted text-muted-foreground hover:bg-muted/80",
+      "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
+    inactive:
+      "bg-transparent text-muted-foreground border border-border hover:border-foreground/20 hover:text-foreground",
   },
   Hard: {
     active:
-      "bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400 ring-1 ring-rose-200 dark:ring-rose-500/30",
-    inactive: "bg-muted text-muted-foreground hover:bg-muted/80",
+      "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20",
+    inactive:
+      "bg-transparent text-muted-foreground border border-border hover:border-foreground/20 hover:text-foreground",
   },
 };
 
@@ -109,10 +112,10 @@ export function DSALab() {
 
   if (!isLoaded) {
     return (
-      <div className="flex items-center justify-center p-12">
+      <div className="flex items-center justify-center p-16">
         <div className="flex items-center gap-3 text-muted-foreground">
-          <div className="w-5 h-5 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
-          <span className="text-sm">Loading problems...</span>
+          <div className="w-4 h-4 border-2 border-border border-t-foreground rounded-full animate-spin" />
+          <span className="text-sm">Loading...</span>
         </div>
       </div>
     );
@@ -123,16 +126,18 @@ export function DSALab() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-foreground">Problem Tracker</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Problem Tracker
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Track problems, strategies, and implementations
           </p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="glass-button flex items-center gap-2"
+          className="glass-button flex items-center gap-1.5 text-[13px]"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-3.5 h-3.5" />
           New Problem
         </button>
       </div>
@@ -164,7 +169,7 @@ export function DSALab() {
                       : [...prev, difficulty as Difficulty],
                   );
                 }}
-                className={`text-xs px-2.5 py-1.5 rounded-lg transition-all font-medium ${
+                className={`text-xs px-2.5 py-1 rounded-full transition-all font-medium ${
                   selectedDifficulties.includes(difficulty as Difficulty)
                     ? DIFFICULTY_FILTER_COLORS[difficulty as Difficulty].active
                     : DIFFICULTY_FILTER_COLORS[difficulty as Difficulty]
@@ -189,10 +194,10 @@ export function DSALab() {
                             : [...prev, tag],
                         );
                       }}
-                      className={`text-xs px-2 py-1 rounded-lg transition-all ${
+                      className={`text-xs px-2 py-1 rounded-full transition-all ${
                         selectedTags.includes(tag)
-                          ? "bg-accent/15 text-accent ring-1 ring-accent/20 font-medium"
-                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                          ? "bg-foreground/10 text-foreground border border-foreground/20 font-medium"
+                          : "bg-transparent text-muted-foreground border border-border hover:border-foreground/20 hover:text-foreground"
                       }`}
                     >
                       {tag}
@@ -208,7 +213,7 @@ export function DSALab() {
                   setSelectedDifficulties([]);
                   setSelectedTags([]);
                 }}
-                className="text-xs text-accent hover:text-accent/80 ml-auto font-medium flex items-center gap-1"
+                className="text-xs text-muted-foreground hover:text-foreground ml-auto font-medium flex items-center gap-1"
               >
                 <X className="w-3 h-3" />
                 Clear
@@ -370,31 +375,23 @@ export function DSALab() {
 
       {/* Questions List */}
       {questions.length === 0 ? (
-        <div className="glass-card p-10 text-center">
-          <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mx-auto mb-3">
-            <Code2 className="w-5 h-5 text-muted-foreground" />
-          </div>
-          <div className="text-sm font-medium text-foreground mb-1">
+        <div className="glass-card p-12 text-center">
+          <Code2 className="w-8 h-8 text-muted-foreground/40 mx-auto mb-3" />
+          <div className="text-sm text-muted-foreground">
             No problems tracked yet
-          </div>
-          <div className="text-xs text-muted-foreground">
-            Add your first problem to get started
           </div>
         </div>
       ) : filteredQuestions.length === 0 ? (
-        <div className="glass-card p-10 text-center">
-          <div className="text-sm text-muted-foreground mb-1">
+        <div className="glass-card p-12 text-center">
+          <div className="text-sm text-muted-foreground">
             No problems match your filters
-          </div>
-          <div className="text-xs text-muted-foreground">
-            Try adjusting your difficulty or tag selection
           </div>
         </div>
       ) : (
-        <div className="divide-y divide-border/30 glass-card overflow-hidden">
+        <div className="divide-y divide-border glass-card overflow-hidden">
           {filteredQuestions.map((question) => (
             <div key={question.id}>
-              <div className="flex items-center gap-3 px-5 py-3.5 hover:bg-muted/30 transition-colors group">
+              <div className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors group">
                 <button
                   onClick={() =>
                     setExpandedId(
@@ -437,15 +434,15 @@ export function DSALab() {
 
                 <button
                   onClick={() => deleteQuestion(question.id)}
-                  className="flex-shrink-0 p-1.5 opacity-0 group-hover:opacity-100 hover:bg-destructive/10 rounded-lg transition-all"
+                  className="flex-shrink-0 p-1 opacity-0 group-hover:opacity-100 hover:bg-muted rounded-md transition-all"
                   title="Delete problem"
                 >
-                  <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                  <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-red-500" />
                 </button>
               </div>
 
               {expandedId === question.id && (
-                <div className="border-t border-border/30 px-5 py-4 space-y-4 bg-muted/15">
+                <div className="border-t border-border px-4 py-4 space-y-4 bg-muted/30">
                   {question.problemStatement && (
                     <div>
                       <h3 className="text-xs font-semibold mb-2 text-muted-foreground uppercase tracking-wide">
@@ -478,7 +475,7 @@ export function DSALab() {
                           {question.language}
                         </span>
                       </div>
-                      <pre className="bg-card border border-border/40 rounded-xl p-4 overflow-x-auto text-xs font-mono text-foreground/80 leading-relaxed">
+                      <pre className="bg-background border border-border rounded-md p-4 overflow-x-auto text-xs font-mono text-foreground/80 leading-relaxed">
                         {question.codeImplementation}
                       </pre>
                     </div>

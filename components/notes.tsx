@@ -10,36 +10,32 @@ import Markdown from "markdown-to-jsx";
 const CATEGORY_COLORS: Record<NoteCategory, { badge: string; border: string }> =
   {
     dsa: {
-      badge: "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400",
-      border: "border-l-blue-400 dark:border-l-blue-500",
+      badge: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+      border: "border-l-blue-500",
     },
     tips: {
-      badge:
-        "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400",
-      border: "border-l-amber-400 dark:border-l-amber-500",
+      badge: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+      border: "border-l-amber-500",
     },
     "system design": {
-      badge:
-        "bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400",
-      border: "border-l-purple-400 dark:border-l-purple-500",
+      badge: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+      border: "border-l-violet-500",
     },
     interview: {
-      badge:
-        "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400",
-      border: "border-l-emerald-400 dark:border-l-emerald-500",
+      badge: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+      border: "border-l-emerald-500",
     },
     job: {
-      badge: "bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400",
-      border: "border-l-rose-400 dark:border-l-rose-500",
+      badge: "bg-red-500/10 text-red-600 dark:text-red-400",
+      border: "border-l-red-500",
     },
     general: {
-      badge:
-        "bg-stone-100 text-stone-700 dark:bg-stone-500/20 dark:text-stone-400",
-      border: "border-l-stone-400 dark:border-l-stone-500",
+      badge: "bg-muted text-muted-foreground",
+      border: "border-l-muted-foreground",
     },
     other: {
-      badge: "bg-sky-100 text-sky-700 dark:bg-sky-500/20 dark:text-sky-400",
-      border: "border-l-sky-400 dark:border-l-sky-500",
+      badge: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
+      border: "border-l-sky-500",
     },
   };
 
@@ -74,7 +70,7 @@ const markdownOverrides = {
   pre: {
     props: {
       className:
-        "bg-card border border-border/40 rounded-xl p-4 overflow-x-auto text-xs font-mono text-foreground/80 leading-relaxed mb-2.5",
+        "bg-background border border-border rounded-md p-4 overflow-x-auto text-xs font-mono text-foreground/80 leading-relaxed mb-2.5",
     },
   },
   a: {
@@ -172,10 +168,10 @@ export function Notes() {
 
   if (!isLoaded) {
     return (
-      <div className="flex items-center justify-center p-12">
+      <div className="flex items-center justify-center p-16">
         <div className="flex items-center gap-3 text-muted-foreground">
-          <div className="w-5 h-5 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
-          <span className="text-sm">Loading notes...</span>
+          <div className="w-4 h-4 border-2 border-border border-t-foreground rounded-full animate-spin" />
+          <span className="text-sm">Loading...</span>
         </div>
       </div>
     );
@@ -186,16 +182,18 @@ export function Notes() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-foreground">Notes</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Notes
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Tips, strategies &amp; preparation notes
           </p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="glass-button flex items-center gap-2"
+          className="glass-button flex items-center gap-1.5 text-[13px]"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-3.5 h-3.5" />
           New Note
         </button>
       </div>
@@ -218,10 +216,10 @@ export function Notes() {
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setSelectedCategory("all")}
-            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+            className={`px-3 py-1 rounded-full text-xs font-medium transition-colors border ${
               selectedCategory === "all"
-                ? "bg-accent/15 text-accent ring-1 ring-accent/30"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
+                ? "bg-foreground text-background border-foreground"
+                : "bg-transparent text-muted-foreground border-border hover:border-foreground/20 hover:text-foreground"
             }`}
           >
             All
@@ -230,10 +228,10 @@ export function Notes() {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors capitalize ${
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors capitalize border ${
                 selectedCategory === cat
-                  ? CATEGORY_COLORS[cat].badge + " ring-1 ring-current/20"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  ? CATEGORY_COLORS[cat].badge + " border-current/20"
+                  : "bg-transparent text-muted-foreground border-border hover:border-foreground/20 hover:text-foreground"
               }`}
             >
               {cat}
@@ -335,7 +333,7 @@ export function Notes() {
                 </p>
               )}
             </div>
-            <div className="pt-3 border-t border-border/30 flex items-center justify-between">
+            <div className="pt-3 border-t border-border flex items-center justify-between">
               <p className="text-[11px] text-muted-foreground">
                 {new Date(viewingNote.createdAt).toLocaleDateString("en-US", {
                   month: "short",
@@ -349,7 +347,7 @@ export function Notes() {
                     openEdit(viewingNote);
                     setViewingNote(null);
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                   Edit
@@ -359,7 +357,7 @@ export function Notes() {
                     deleteNote(viewingNote.id);
                     setViewingNote(null);
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-red-500 hover:bg-muted rounded-md transition-colors"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   Delete
@@ -436,11 +434,8 @@ export function Notes() {
       {/* Notes Grid — Google Keep style */}
       {filteredNotes.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-          <StickyNote className="w-10 h-10 mb-3 opacity-40" />
-          <p className="text-sm font-medium">No notes yet</p>
-          <p className="text-xs mt-1">
-            Click &quot;New Note&quot; to get started
-          </p>
+          <StickyNote className="w-8 h-8 mb-3 opacity-30" />
+          <p className="text-sm">No notes yet</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -451,7 +446,7 @@ export function Notes() {
               <div
                 key={note.id}
                 onClick={() => setViewingNote(note)}
-                className={`group bg-card border border-border/50 rounded-xl overflow-hidden hover:shadow-md transition-all duration-200 border-l-[3px] cursor-pointer ${colors.border}`}
+                className={`group bg-card border border-border rounded-lg overflow-hidden hover:border-foreground/20 transition-all duration-150 border-l-[3px] cursor-pointer ${colors.border}`}
               >
                 {/* Card Header */}
                 <div className="px-4 pt-4 pb-2 flex items-start justify-between gap-2">
@@ -471,7 +466,7 @@ export function Notes() {
                         e.stopPropagation();
                         openEdit(note);
                       }}
-                      className="p-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground"
+                      className="p-1 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-foreground"
                       title="Edit"
                     >
                       <Pencil className="w-3.5 h-3.5" />
@@ -481,7 +476,7 @@ export function Notes() {
                         e.stopPropagation();
                         deleteNote(note.id);
                       }}
-                      className="p-1.5 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors text-muted-foreground hover:text-red-500"
+                      className="p-1 hover:bg-muted rounded-md transition-colors text-muted-foreground hover:text-red-500"
                       title="Delete"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -507,7 +502,7 @@ export function Notes() {
                 </div>
 
                 {/* Card Footer */}
-                <div className="px-4 py-2 border-t border-border/30">
+                <div className="px-4 py-2 border-t border-border">
                   <p className="text-[10px] text-muted-foreground">
                     {new Date(note.createdAt).toLocaleDateString("en-US", {
                       month: "short",

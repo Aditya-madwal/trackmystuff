@@ -27,22 +27,22 @@ const STATUS_CONFIG = {
   todo: {
     label: "Todo",
     icon: Circle,
-    color: "text-stone-400 dark:text-stone-500",
-    bg: "bg-stone-100 dark:bg-stone-800/40",
-    textColor: "text-stone-500 dark:text-stone-400",
+    color: "text-muted-foreground",
+    bg: "bg-muted",
+    textColor: "text-muted-foreground",
   },
   "in-progress": {
     label: "In Progress",
     icon: Clock,
-    color: "text-sky-500",
-    bg: "bg-sky-50 dark:bg-sky-500/10",
-    textColor: "text-sky-600 dark:text-sky-400",
+    color: "text-amber-500",
+    bg: "bg-amber-500/10",
+    textColor: "text-amber-600 dark:text-amber-400",
   },
   completed: {
     label: "Completed",
     icon: CheckCircle2,
     color: "text-emerald-500",
-    bg: "bg-emerald-50 dark:bg-emerald-500/10",
+    bg: "bg-emerald-500/10",
     textColor: "text-emerald-600 dark:text-emerald-400",
   },
 };
@@ -118,10 +118,10 @@ export function Dashboard() {
 
   if (!isLoaded || !resourcesLoaded) {
     return (
-      <div className="flex items-center justify-center p-12">
+      <div className="flex items-center justify-center p-16">
         <div className="flex items-center gap-3 text-muted-foreground">
-          <div className="w-5 h-5 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
-          <span className="text-sm">Loading workspace...</span>
+          <div className="w-4 h-4 border-2 border-border border-t-foreground rounded-full animate-spin" />
+          <span className="text-sm">Loading...</span>
         </div>
       </div>
     );
@@ -132,16 +132,18 @@ export function Dashboard() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Dashboard
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Track your tasks and manage resources
           </p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="glass-button flex items-center gap-2"
+          className="glass-button flex items-center gap-1.5 text-[13px]"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-3.5 h-3.5" />
           New Task
         </button>
       </div>
@@ -236,54 +238,44 @@ export function Dashboard() {
       )}
 
       {/* Two-column grid: Tasks + Resources */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Task List */}
         <div className="glass-card">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border/40">
-            <div className="flex items-center gap-2.5">
-              <h2 className="text-sm font-semibold">Sprint Backlog</h2>
-              <span className="badge badge-gray text-[11px]">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+            <div className="flex items-center gap-2">
+              <h2 className="text-[13px] font-medium text-foreground">Tasks</h2>
+              <span className="text-xs text-muted-foreground">
                 {filteredTasks.length}
               </span>
             </div>
             <button
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg bg-accent/10 text-accent hover:bg-accent/15 transition-colors font-medium"
+              className="flex items-center gap-1 px-2 py-1 text-xs rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
-              New
+              Add
             </button>
           </div>
 
           {tasks.length === 0 ? (
-            <div className="text-center py-10 px-4">
-              <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mx-auto mb-3">
-                <ListChecks className="w-5 h-5 text-muted-foreground" />
-              </div>
-              <div className="text-sm font-medium text-foreground mb-1">
-                No tasks yet
-              </div>
-              <div className="text-xs text-muted-foreground">
-                Create your first task to get started
-              </div>
+            <div className="text-center py-12 px-4">
+              <ListChecks className="w-8 h-8 text-muted-foreground/40 mx-auto mb-3" />
+              <div className="text-sm text-muted-foreground">No tasks yet</div>
             </div>
           ) : filteredTasks.length === 0 ? (
-            <div className="text-center py-10 px-4">
-              <div className="text-sm text-muted-foreground mb-1">
+            <div className="text-center py-12 px-4">
+              <div className="text-sm text-muted-foreground">
                 No tasks match your search
-              </div>
-              <div className="text-xs text-muted-foreground">
-                Try adjusting your search query
               </div>
             </div>
           ) : (
-            <div className="divide-y divide-border/30">
+            <div className="divide-y divide-border">
               {filteredTasks.map((task) => {
                 const StatusIcon = STATUS_CONFIG[task.status].icon;
                 return (
                   <div
                     key={task.id}
-                    className="flex items-start gap-3 px-5 py-3.5 hover:bg-muted/30 transition-colors group"
+                    className="flex items-start gap-3 px-4 py-3 hover:bg-muted/50 transition-colors group"
                   >
                     <button
                       onClick={() =>
@@ -322,10 +314,10 @@ export function Dashboard() {
 
                     <button
                       onClick={() => deleteTask(task.id)}
-                      className="flex-shrink-0 mt-0.5 p-1.5 opacity-0 group-hover:opacity-100 hover:bg-destructive/10 rounded-lg transition-all"
+                      className="flex-shrink-0 mt-0.5 p-1 opacity-0 group-hover:opacity-100 hover:bg-muted rounded-md transition-all"
                       title="Delete task"
                     >
-                      <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                      <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-red-500" />
                     </button>
                   </div>
                 );
@@ -336,16 +328,18 @@ export function Dashboard() {
 
         {/* Important Resources */}
         <div className="glass-card flex flex-col">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-border/40">
-            <div className="flex items-center gap-2.5">
-              <h2 className="text-sm font-semibold">Important Resources</h2>
-              <span className="badge badge-gray text-[11px]">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+            <div className="flex items-center gap-2">
+              <h2 className="text-[13px] font-medium text-foreground">
+                Resources
+              </h2>
+              <span className="text-xs text-muted-foreground">
                 {resources.length}
               </span>
             </div>
             <button
               onClick={() => setShowResourceForm(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg bg-accent/10 text-accent hover:bg-accent/15 transition-colors font-medium"
+              className="flex items-center gap-1 px-2 py-1 text-xs rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
               <BookmarkPlus className="w-3.5 h-3.5" />
               Add
@@ -428,26 +422,21 @@ export function Dashboard() {
 
           {/* Resources List */}
           {resources.length === 0 ? (
-            <div className="text-center py-10 px-4">
-              <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mx-auto mb-3">
-                <BookmarkPlus className="w-5 h-5 text-muted-foreground" />
-              </div>
-              <div className="text-sm font-medium text-foreground mb-1">
+            <div className="text-center py-12 px-4">
+              <BookmarkPlus className="w-8 h-8 text-muted-foreground/40 mx-auto mb-3" />
+              <div className="text-sm text-muted-foreground">
                 No resources yet
-              </div>
-              <div className="text-xs text-muted-foreground">
-                Save important links for quick access
               </div>
             </div>
           ) : (
-            <div className="divide-y divide-border/30 flex-1">
+            <div className="divide-y divide-border flex-1">
               {resources.map((r) => (
                 <div
                   key={r.id}
-                  className="flex items-center gap-3 px-5 py-3.5 hover:bg-muted/30 transition-colors group"
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors group"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-accent/8 flex items-center justify-center flex-shrink-0">
-                    <ExternalLink className="w-3.5 h-3.5 text-accent" />
+                  <div className="w-7 h-7 rounded-md bg-muted flex items-center justify-center flex-shrink-0">
+                    <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <a
@@ -466,10 +455,10 @@ export function Dashboard() {
                   </div>
                   <button
                     onClick={() => deleteResource(r.id)}
-                    className="p-1.5 opacity-0 group-hover:opacity-100 hover:bg-destructive/10 rounded-lg transition-all flex-shrink-0"
+                    className="p-1 opacity-0 group-hover:opacity-100 hover:bg-muted rounded-md transition-all flex-shrink-0"
                     title="Delete resource"
                   >
-                    <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                    <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-red-500" />
                   </button>
                 </div>
               ))}

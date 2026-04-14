@@ -37,7 +37,7 @@ const markdownOverrides = {
   pre: {
     props: {
       className:
-        "bg-card border border-border/40 rounded-xl p-4 overflow-x-auto text-xs font-mono text-foreground/80 leading-relaxed mb-2.5",
+        "bg-background border border-border rounded-md p-4 overflow-x-auto text-xs font-mono text-foreground/80 leading-relaxed mb-2.5",
     },
   },
   a: {
@@ -105,10 +105,10 @@ export function SystemDesign() {
 
   if (!isLoaded) {
     return (
-      <div className="flex items-center justify-center p-12">
+      <div className="flex items-center justify-center p-16">
         <div className="flex items-center gap-3 text-muted-foreground">
-          <div className="w-5 h-5 border-2 border-accent/30 border-t-accent rounded-full animate-spin" />
-          <span className="text-sm">Loading notes...</span>
+          <div className="w-4 h-4 border-2 border-border border-t-foreground rounded-full animate-spin" />
+          <span className="text-sm">Loading...</span>
         </div>
       </div>
     );
@@ -119,18 +119,18 @@ export function SystemDesign() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-foreground">
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
             Architecture Notes
           </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <p className="text-sm text-muted-foreground mt-1">
             Patterns, designs, and knowledge base
           </p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="glass-button flex items-center gap-2"
+          className="glass-button flex items-center gap-1.5 text-[13px]"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-3.5 h-3.5" />
           New Note
         </button>
       </div>
@@ -237,28 +237,18 @@ Example: CAP Theorem | https://example.com`}
 
       {/* Notes List */}
       {notes.length === 0 ? (
-        <div className="glass-card p-10 text-center">
-          <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mx-auto mb-3">
-            <Plus className="w-5 h-5 text-muted-foreground" />
-          </div>
-          <div className="text-sm font-medium text-foreground mb-1">
-            No notes yet
-          </div>
-          <div className="text-xs text-muted-foreground">
-            Create your first note to get started
-          </div>
+        <div className="glass-card p-12 text-center">
+          <Plus className="w-8 h-8 text-muted-foreground/40 mx-auto mb-3" />
+          <div className="text-sm text-muted-foreground">No notes yet</div>
         </div>
       ) : filteredNotes.length === 0 ? (
-        <div className="glass-card p-10 text-center">
-          <div className="text-sm text-muted-foreground mb-1">
+        <div className="glass-card p-12 text-center">
+          <div className="text-sm text-muted-foreground">
             No notes match your search
-          </div>
-          <div className="text-xs text-muted-foreground">
-            Try adjusting your search query
           </div>
         </div>
       ) : (
-        <div className="divide-y divide-border/30 glass-card overflow-hidden">
+        <div className="divide-y divide-border glass-card overflow-hidden">
           {filteredNotes.map((note) => (
             <div key={note.id}>
               <div
@@ -273,7 +263,7 @@ Example: CAP Theorem | https://example.com`}
                     setExpandedId(expandedId === note.id ? null : note.id);
                   }
                 }}
-                className="w-full flex items-center gap-3 px-5 py-3.5 hover:bg-muted/30 transition-colors group cursor-pointer"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors group cursor-pointer"
               >
                 <ChevronDown
                   className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform duration-200 ${
@@ -299,15 +289,15 @@ Example: CAP Theorem | https://example.com`}
                     e.stopPropagation();
                     deleteNote(note.id);
                   }}
-                  className="flex-shrink-0 p-1.5 opacity-0 group-hover:opacity-100 hover:bg-destructive/10 rounded-lg transition-all"
+                  className="flex-shrink-0 p-1 opacity-0 group-hover:opacity-100 hover:bg-muted rounded-md transition-all"
                   title="Delete note"
                 >
-                  <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                  <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-red-500" />
                 </button>
               </div>
 
               {expandedId === note.id && (
-                <div className="border-t border-border/30 px-5 py-4 space-y-4 bg-muted/15">
+                <div className="border-t border-border px-4 py-4 space-y-4 bg-muted/30">
                   <div className="max-w-none">
                     <Markdown options={{ overrides: markdownOverrides }}>
                       {note.content}
